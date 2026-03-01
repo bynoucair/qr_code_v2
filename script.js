@@ -1,10 +1,10 @@
 const MASTER_KEY = "1988"; 
-const GOOGLE_SHEET_URL = "https://script.google.com/macros/s/AKfycbyRAlovcMv5XrgGihMgplklDl0vBpf_j5rnp_4lT70yXZeUPZH2n3lxgo75mNWQnu635g/exec";
+const GOOGLE_SHEET_URL = "https://script.google.com/macros/s/AKfycbwNRkFoFZFI3nsVhyeuwXY9G_PAynPURHo-LW5nT-jSiekkN6VgAq9MlqGCMatAIm2tjQ/exec";
 
 const canvas = document.getElementById('output-canvas');
 const ctx = canvas.getContext('2d');
 
-/** 1. SECURITY & SYNC PROTOCOLS **/
+/** 1. SECURITY & DATA SYNCHRONIZATION **/
 function checkProtocol(val) {
     if (val === MASTER_KEY) {
         document.getElementById('sentinel').classList.add('unlocked');
@@ -17,11 +17,11 @@ async function submitToSheet() {
     const btn = document.getElementById('submit-btn');
 
     if (!nameInput.value || !emailInput.value) {
-        alert("Action Required: Provide Name and Email for identity synthesis.");
+        alert("Strategic Oversight: Please provide Name and Email.");
         return;
     }
 
-    // Dynamic ID Logic
+    // Dynamic ID Generation
     const randomID = Math.random().toString(36).substring(2, 8).toUpperCase();
     const fullID = `ARCHITECT-REQ-${randomID}`;
 
@@ -29,9 +29,10 @@ async function submitToSheet() {
     btn.disabled = true;
 
     try {
+        // Essential 'no-cors' mode for GitHub-to-Google communication
         await fetch(GOOGLE_SHEET_URL, {
             method: 'POST',
-            mode: 'no-cors',
+            mode: 'no-cors', 
             cache: 'no-cache',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ 
@@ -41,21 +42,19 @@ async function submitToSheet() {
             })
         });
 
-        btn.innerText = "SUCCESS";
+        // UI Feedback: Assuming success with no-cors
+        btn.innerText = "REQUEST SENT";
         btn.style.background = "#10b981";
         
-        alert(`Identity Logged!\n\nID: ${fullID}\n\nNoucair has received your credentials. Check your WhatsApp/Email for the Master Key.`);
+        alert(`Success! Your Request ID is: ${fullID}\n\nNoucair has received your data. Access Key will be sent via WhatsApp/Email.`);
         
-        // Reset
         nameInput.value = "";
         emailInput.value = "";
         btn.disabled = false;
-        btn.innerText = "Request Access";
-        btn.style.background = "";
 
     } catch (error) {
         console.error("Sync Error:", error);
-        btn.innerText = "RETRY SYNC";
+        btn.innerText = "RETRY";
         btn.disabled = false;
     }
 }
