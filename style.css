@@ -1,52 +1,101 @@
-@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;700;800&family=JetBrains+Mono:wght@500;700&display=swap');
+const MASTER_KEY = "1988"; 
+const GOOGLE_URL = "https://script.google.com/macros/s/AKfycbwNRkFoFZFI3nsVhyeuwXY9G_PAynPURHo-LW5nT-jSiekkN6VgAq9MlqGCMatAIm2tjQ/exec";
 
-:root { --accent: #3b82f6; --glass-bg: rgba(15, 23, 42, 0.6); --border: rgba(255, 255, 255, 0.08); }
+const canvas = document.getElementById('output-canvas');
+const ctx = canvas.getContext('2d');
 
-* { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-body { font-family: 'Plus Jakarta Sans', sans-serif; height: 100vh; margin: 0; background-color: #020617; }
-
-/* UTILS */
-.glass-blur { background: var(--glass-bg); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border: 1px solid var(--border); }
-.glass-card { background: rgba(255,255,255,0.02); border: 1px solid var(--border); border-radius: 24px; backdrop-filter: blur(10px); }
-
-/* LAYOUT */
-.app-shell { height: 100vh; display: flex; flex-direction: column; }
-.top-nav { height: 60px; padding: 0 24px; display: flex; items-center: center; justify-content: space-between; z-index: 100; border-top: none; border-left: none; border-right: none; }
-
-.main-content { flex: 1; display: flex; overflow: hidden; position: relative; }
-
-.preview-stage { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 40px; }
-.qr-container { width: 100%; max-width: 550px; aspect-ratio: 1/1; padding: 6%; display: flex; align-items: center; justify-content: center; }
-#output-canvas { width: 100% !important; height: 100% !important; border-radius: 12px; }
-
-/* PARAMETERS SIDEBAR */
-.parameters-panel { 
-    width: 380px; padding: 30px; border-top: none; border-bottom: none; border-right: none;
-    transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+function toggleSidebar() {
+    document.getElementById('sidebar').classList.toggle('active');
 }
 
-@media (max-width: 1024px) {
-    .parameters-panel { position: fixed; right: 0; top: 0; height: 100%; z-index: 1000; transform: translateX(100%); width: 320px; box-shadow: -20px 0 50px rgba(0,0,0,0.5); }
-    .parameters-panel.active { transform: translateX(0); }
-    .preview-stage { padding: 20px; }
+function checkProtocol(val) {
+    if (val === MASTER_KEY) {
+        document.getElementById('sentinel').classList.add('unlocked');
+        setTimeout(update, 300);
+    }
 }
 
-/* UI ELEMENTS */
-.control-group label { display: block; font-size: 8px; font-weight: 800; text-transform: uppercase; color: var(--accent); letter-spacing: 2px; margin-bottom: 12px; }
-.glass-input { width: 100%; background: rgba(0,0,0,0.3); border: 1px solid var(--border); border-radius: 12px; padding: 12px; color: #fff; font-size: 11px; outline: none; transition: 0.3s; }
-.glass-input:focus { border-color: var(--accent); box-shadow: 0 0 15px rgba(59,130,246,0.2); }
+async function submitToSheet() {
+    const name = document.getElementById('req-name').value;
+    const email = document.getElementById('req-email').value;
+    const btn = document.getElementById('submit-btn');
+    if(!name || !email) return;
 
-.range-box span { font-size: 9px; color: rgba(255,255,255,0.5); font-weight: bold; text-transform: uppercase; }
-input[type="range"] { width: 100%; height: 4px; border-radius: 2px; -webkit-appearance: none; background: rgba(255,255,255,0.1); }
-input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; width: 16px; height: 16px; background: var(--accent); border-radius: 50%; cursor: pointer; }
+    const id = `ARC-${Math.random().toString(36).substring(2, 7).toUpperCase()}`;
+    btn.innerText = "SYNCHRONIZING...";
+    btn.disabled = true;
 
-.btn-primary { background: var(--accent); color: #fff; font-weight: 800; font-size: 10px; letter-spacing: 1.5px; padding: 16px; border-radius: 16px; transition: 0.3s; border: none; }
-.btn-glass { background: rgba(255,255,255,0.05); border: 1px solid var(--border); color: #fff; font-weight: 800; font-size: 10px; padding: 12px 24px; border-radius: 100px; transition: 0.3s; }
-.btn-glass:hover { background: #fff; color: #000; }
+    try {
+        await fetch(GOOGLE_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify({ name, email, id }) });
+        btn.innerText = "SUCCESS";
+        alert(`ACCESS REQUESTED. ID: ${id}`);
+    } catch (e) { btn.innerText = "ERROR"; btn.disabled = false; }
+}
 
-.color-picker { width: 100%; height: 45px; background: none; border: 1px solid var(--border); border-radius: 12px; cursor: pointer; }
+function update() {
+    const color = document.getElementById('qr-color').value;
+    document.documentElement.style.setProperty('--accent', color);
+    
+    const source = document.getElementById('qrcode-raw');
+    source.innerHTML = "";
+    
+    new QRCode(source, {
+        text: document.getElementById('qr-input').value || "https://allthinkers.com",
+        width: 1200, height: 1200,
+        colorDark : color, colorLight : "#ffffff",
+        correctLevel : QRCode.CorrectLevel.H
+    });
 
-/* SENTINEL */
-.sentinel-gate { position: fixed; inset: 0; background: #020617; z-index: 5000; display: flex; align-items: center; justify-content: center; transition: 0.8s; }
-.sentinel-gate.unlocked { opacity: 0; pointer-events: none; transform: scale(1.1); }
-.pass-input { width: 100%; background: rgba(255,255,255,0.03); border: 1px solid var(--border); border-radius: 100px; padding: 18px; text-align: center; color: #fff; letter-spacing: 0.5em; outline: none; }
+    // Debounced rendering to ensure QR is ready
+    setTimeout(() => { 
+        const qr = source.querySelector('canvas'); 
+        if (qr) render(qr); 
+    }, 150);
+}
+
+function render(qr) {
+    const text = document.getElementById('qr-caption').value.toUpperCase();
+    const color = document.getElementById('qr-color').value;
+    const scale = parseFloat(document.getElementById('qr-scale').value);
+    const fontSize = parseInt(document.getElementById('qr-font').value);
+    const gap = parseInt(document.getElementById('qr-gap').value);
+    
+    const size = 1600; 
+    canvas.width = size; canvas.height = size;
+    
+    // Base Canvas
+    ctx.fillStyle = "#ffffff"; 
+    ctx.fillRect(0, 0, size, size);
+
+    const qrSize = size * scale;
+    const labelH = 180;
+    const totalH = qrSize + gap + labelH;
+    const startY = (size - totalH) / 2;
+
+    // QR Draw
+    ctx.drawImage(qr, (size - qrSize) / 2, startY, qrSize, qrSize);
+
+    // Dynamic Label
+    ctx.fillStyle = color;
+    ctx.beginPath();
+    const labelY = startY + qrSize + gap;
+    ctx.roundRect((size - (qrSize + 40))/2, labelY, qrSize + 40, labelH, 40);
+    ctx.fill();
+
+    // Typography
+    ctx.fillStyle = "#ffffff";
+    ctx.font = `bold ${fontSize * 1.8}px 'Plus Jakarta Sans'`;
+    ctx.textAlign = "center";
+    ctx.textBaseline = "middle";
+    ctx.fillText(text, size / 2, labelY + (labelH / 2) + 5);
+}
+
+function handleDownload() {
+    const link = document.createElement('a');
+    link.download = `Architect-Ecosystem-${Date.now()}.png`;
+    link.href = canvas.toDataURL("image/png", 1.0);
+    link.click();
+}
+
+// Initial Call
+window.onload = () => { if(window.location.hash === "#auth") document.getElementById('sentinel').remove(); };
