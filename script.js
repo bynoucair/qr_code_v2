@@ -1,6 +1,4 @@
 const MASTER_KEY = "1988"; 
-const GOOGLE_URL = "https://script.google.com/macros/s/AKfycbwNRkFoFZFI3nsVhyeuwXY9G_PAynPURHo-LW5nT-jSiekkN6VgAq9MlqGCMatAIm2tjQ/exec";
-
 const canvas = document.getElementById('output-canvas');
 const ctx = canvas.getContext('2d');
 
@@ -15,31 +13,16 @@ function checkProtocol(val) {
     }
 }
 
-async function submitToSheet() {
-    const name = document.getElementById('req-name').value;
-    const email = document.getElementById('req-email').value;
-    const btn = document.getElementById('submit-btn');
-    if(!name || !email) return alert("Fill Name/Email");
-
-    const id = `ARCHITECT-REQ-${Math.random().toString(36).substring(2, 8).toUpperCase()}`;
-    btn.innerText = "SYNCING...";
-
-    try {
-        await fetch(GOOGLE_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify({ name, email, id }) });
-        alert(`Success! ID: ${id}`);
-        btn.innerText = "REQUEST SENT";
-    } catch (e) { btn.innerText = "ERROR"; }
-}
-
 function update() {
     const color = document.getElementById('qr-color').value;
     document.documentElement.style.setProperty('--brand', color);
     const source = document.getElementById('qrcode-raw');
     source.innerHTML = "";
     
+    // Higher resolution source for crisp rendering
     new QRCode(source, {
         text: document.getElementById('qr-input').value || "https://allthinkers.com",
-        width: 1000, height: 1000,
+        width: 1200, height: 1200,
         colorDark : color, colorLight : "#ffffff",
         correctLevel : QRCode.CorrectLevel.H
     });
@@ -47,7 +30,7 @@ function update() {
     setTimeout(() => { 
         const qr = source.querySelector('canvas'); 
         if (qr) render(qr); 
-    }, 100);
+    }, 120);
 }
 
 function render(qr) {
@@ -56,28 +39,33 @@ function render(qr) {
     const scale = parseFloat(document.getElementById('qr-scale').value);
     const fontSize = parseInt(document.getElementById('qr-font').value);
     
-    const size = 1200; canvas.width = size; canvas.height = size;
+    const size = 1500; canvas.width = size; canvas.height = size;
     ctx.fillStyle = "#ffffff"; ctx.fillRect(0, 0, size, size);
 
     const qrSize = size * scale;
-    ctx.drawImage(qr, (size-qrSize)/2, (size-qrSize)/2 - 80, qrSize, qrSize);
+    // Position QR slightly higher to make room for caption
+    ctx.drawImage(qr, (size-qrSize)/2, (size-qrSize)/2 - 100, qrSize, qrSize);
 
+    // Draw Designer Label
     ctx.fillStyle = color;
     ctx.beginPath();
-    ctx.roundRect(100, 950, 1000, 150, 40);
+    ctx.roundRect(100, size - 250, size - 200, 180, 50);
     ctx.fill();
 
     ctx.fillStyle = "#ffffff";
-    ctx.font = `bold ${fontSize * 1.5}px Arial`;
+    ctx.font = `bold ${fontSize * 1.8}px Arial`;
     ctx.textAlign = "center";
-    ctx.fillText(text, size/2, 1045);
+    ctx.fillText(text, size/2, size - 145);
 }
 
 function handleDownload() {
     const link = document.createElement('a');
-    link.download = `QR-Architect.png`;
-    link.href = canvas.toDataURL("image/png");
+    link.download = `Architect-Prime-v4.png`;
+    link.href = canvas.toDataURL("image/png", 1.0);
     link.click();
 }
 
-window.onload = () => { if(window.location.hash === "#test") document.getElementById('sentinel').remove(); };
+window.onload = () => {
+    // Hidden debug for mobile testing
+    if(window.location.hash === "#bypass") document.getElementById('sentinel').remove();
+};
