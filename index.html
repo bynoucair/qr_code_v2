@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Architect Prime | Noucair B. Ecosystem</title>
+    <title>Architect Prime | Noucair B.</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     <link rel="stylesheet" href="style.css">
@@ -11,75 +11,66 @@
 <body class="bg-slate-950 text-slate-100 overflow-hidden">
 
     <div id="sentinel" class="sentinel-gate">
-        <div class="glass-card p-8 w-[90%] max-w-md flex flex-col items-center gap-6 text-center">
-            <div class="w-16 h-16 bg-blue-600 rounded-2xl flex items-center justify-center font-black shadow-[0_0_30px_rgba(37,99,235,0.5)]">N</div>
-            <div class="space-y-2">
-                <h2 class="text-xs font-black uppercase tracking-[0.4em]">Security Protocol</h2>
-                <p class="text-[10px] text-slate-400 uppercase tracking-widest">Authorized Entry Only</p>
-            </div>
+        <div class="glass-card p-10 flex flex-col items-center gap-6">
+            <div class="w-16 h-16 bg-blue-600 rounded-2xl flex items-center justify-center font-black shadow-[0_0_30px_rgba(37,99,235,0.4)]">N</div>
             <input type="password" id="access-key" class="pass-input" placeholder="MASTER KEY" oninput="checkProtocol(this.value)">
-            <div class="h-[1px] w-full bg-white/5"></div>
-            <div class="w-full space-y-3">
-                <input type="text" id="req-name" class="glass-input" placeholder="FULL NAME">
-                <input type="email" id="req-email" class="glass-input" placeholder="EMAIL">
-                <button onclick="submitToSheet()" id="submit-btn" class="btn-primary w-full">REQUEST ACCESS</button>
-            </div>
+            <p class="text-[8px] font-bold text-slate-500 tracking-[0.4em] uppercase">Authorized Access Only</p>
         </div>
     </div>
 
     <div class="app-shell">
         <nav class="top-nav glass-blur">
-            <div class="flex items-center gap-3">
-                <div class="w-6 h-6 bg-blue-600 rounded flex items-center justify-center text-[10px] font-bold">N</div>
-                <span class="text-[9px] font-black uppercase tracking-[0.3em] hidden sm:inline">Architect Prime</span>
+            <div class="brand-group">
+                <div class="w-6 h-6 bg-blue-600 rounded flex items-center justify-center text-[10px] font-black">N</div>
+                <span class="nav-text">BY NOUCAIR B.</span>
             </div>
-            <div class="flex gap-4">
-                <a href="#" class="text-[8px] font-bold uppercase tracking-widest hover:text-blue-400 transition">AllThinkers</a>
-                <a href="#" class="text-[8px] font-bold uppercase tracking-widest hover:text-blue-400 transition">Andromeders</a>
+            <div class="nav-links">
+                <span class="nav-link">ALLTHINKERS</span>
+                <span class="nav-link">ANDROMEDERS</span>
             </div>
-            <button onclick="toggleSidebar()" class="lg:hidden text-[9px] font-black border border-white/20 px-3 py-1 rounded-full uppercase">Tune</button>
+            <button onclick="toggleSidebar()" class="lg:hidden tune-btn">TUNE</button>
         </nav>
 
         <main class="main-content">
             <section class="preview-stage">
-                <div class="qr-container glass-card">
+                <div class="qr-wrapper glass-card">
                     <canvas id="output-canvas"></canvas>
                 </div>
-                <div class="flex gap-3 mt-8">
-                    <button onclick="handleDownload()" class="btn-glass px-8">EXPORT PNG</button>
+                <div class="action-bar">
+                    <button onclick="handleDownload()" class="btn-primary">SAVE PNG</button>
                 </div>
             </section>
 
             <aside id="sidebar" class="parameters-panel glass-blur">
-                <div class="flex justify-between items-center mb-8 lg:hidden">
-                    <span class="text-[10px] font-black uppercase tracking-widest">Tuning Hub</span>
-                    <button onclick="toggleSidebar()" class="text-xl">&times;</button>
+                <div class="panel-header lg:hidden">
+                    <span class="text-[10px] font-black tracking-widest uppercase">Tuning Hub</span>
+                    <button onclick="toggleSidebar()" class="text-2xl">&times;</button>
                 </div>
 
-                <div class="space-y-6 overflow-y-auto max-h-[80vh] pr-2">
-                    <div class="control-group">
-                        <label>Identity Source</label>
+                <div class="control-list">
+                    <div class="group">
+                        <label>Identity Hub</label>
                         <input type="text" id="qr-input" value="https://allthinkers.com" class="glass-input" oninput="update()">
                         <input type="text" id="qr-caption" value="ACCESS ECOSYSTEM" class="glass-input mt-2" oninput="update()">
                     </div>
 
-                    <div class="control-group">
+                    <div class="group">
                         <label>Brand Hue</label>
-                        <input type="color" id="qr-color" value="#3b82f6" class="color-picker" oninput="update()">
+                        <input type="color" id="qr-color" value="#3b82f6" class="color-box" oninput="update()">
                     </div>
 
-                    <div class="control-group">
+                    <div class="group">
                         <label>Spatial Synthesis</label>
-                        <div class="range-box">
-                            <span>QR Scale</span>
+                        <div class="range-row">
+                            <span>Scale</span>
                             <input type="range" id="qr-scale" min="0.4" max="0.8" step="0.01" value="0.65" oninput="update()">
                         </div>
-                        <div class="range-box mt-4">
-                            <span>Vertical Gap</span>
-                            <input type="range" id="qr-gap" min="20" max="250" step="1" value="100" oninput="update()">
+                        <div class="range-row">
+                            <span>Gap</span>
+                            <input type="range" id="qr-gap" min="20" max="200" step="1" value="100" oninput="update()">
                         </div>
-                        <div class="range-box mt-4">
-                            <span>Font Size</span>
+                        <div class="range-row">
+                            <span>Font</span>
                             <input type="range" id="qr-font" min="20" max="70" step="1" value="45" oninput="update()">
                         </div>
                     </div>
