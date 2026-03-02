@@ -65,6 +65,67 @@ function handleDownload() {
     link.click();
 }
 
+function render(qr) {
+    const text = document.getElementById('qr-caption').value.toUpperCase();
+    const color = document.getElementById('qr-color').value;
+    const scale = parseFloat(document.getElementById('qr-scale').value);
+    const fontSize = parseInt(document.getElementById('qr-font').value);
+    const gap = parseInt(document.getElementById('qr-gap').value); // New Gap Parameter
+    
+    const size = 1500; 
+    canvas.width = size; 
+    canvas.height = size;
+    
+    // Background
+    ctx.fillStyle = "#ffffff"; 
+    ctx.fillRect(0, 0, size, size);
+
+    const qrSize = size * scale;
+    const labelHeight = 160;
+    
+    // Calculate total content height to center everything vertically
+    const totalContentHeight = qrSize + gap + labelHeight;
+    const startY = (size - totalContentHeight) / 2;
+
+    // 1. Draw QR Code
+    ctx.drawImage(qr, (size - qrSize) / 2, startY, qrSize, qrSize);
+
+    // 2. Draw Label (with the specified Gap)
+    ctx.fillStyle = color;
+    ctx.beginPath();
+    const labelY = startY + qrSize + gap;
+    ctx.roundRect(150, labelY, size - 300, labelHeight, 40);
+    ctx.fill();
+
+    // 3. Draw Text
+    ctx.fillStyle = "#ffffff";
+    ctx.font = `bold ${fontSize * 1.8}px Arial`;
+    ctx.textAlign = "center";
+    ctx.textBaseline = "middle";
+    ctx.fillText(text, size / 2, labelY + (labelHeight / 2) + 5);
+}
+
+// Ensure the update function pulls the new gap value
+function update() {
+    const color = document.getElementById('qr-color').value;
+    document.documentElement.style.setProperty('--brand', color);
+    const source = document.getElementById('qrcode-raw');
+    source.innerHTML = "";
+    
+    new QRCode(source, {
+        text: document.getElementById('qr-input').value || "https://allthinkers.com",
+        width: 1200, height: 1200,
+        colorDark : color, colorLight : "#ffffff",
+        correctLevel : QRCode.CorrectLevel.H
+    });
+
+    setTimeout(() => { 
+        const qr = source.querySelector('canvas'); 
+        if (qr) render(qr); 
+    }, 120);
+}
+
+
 window.onload = () => {
     // Hidden debug for mobile testing
     if(window.location.hash === "#bypass") document.getElementById('sentinel').remove();
