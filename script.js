@@ -1,25 +1,12 @@
 const MASTER_KEY = "1988"; 
 const GOOGLE_URL = "https://script.google.com/macros/s/AKfycbwNRkFoFZFI3nsVhyeuwXY9G_PAynPURHo-LW5nT-jSiekkN6VgAq9MlqGCMatAIm2tjQ/exec";
 
-// DOM References
 const canvas = document.getElementById('output-canvas');
 const ctx = canvas.getContext('2d');
 
-// 1. MOBILE-SAFE INITIALIZATION
-document.addEventListener('DOMContentLoaded', () => {
-    // Force initial render
-    setTimeout(update, 500);
-    
-    // Bind button for mobile touch
-    const submitBtn = document.getElementById('submit-btn');
-    if(submitBtn) {
-        submitBtn.addEventListener('click', submitToSheet);
-        submitBtn.addEventListener('touchend', (e) => {
-            e.preventDefault();
-            submitToSheet();
-        });
-    }
-});
+function toggleSidebar() {
+    document.getElementById('sidebar').classList.toggle('active');
+}
 
 function checkProtocol(val) {
     if (val === MASTER_KEY) {
@@ -32,67 +19,65 @@ async function submitToSheet() {
     const name = document.getElementById('req-name').value;
     const email = document.getElementById('req-email').value;
     const btn = document.getElementById('submit-btn');
+    if(!name || !email) return alert("Fill Name/Email");
 
-    if (!name || !email) return alert("Missing Credentials");
-
-    const id = `ARCHITECT-REQ-${Math.random().toString(36).substring(2, 7).toUpperCase()}`;
+    const id = `ARCHITECT-REQ-${Math.random().toString(36).substring(2, 8).toUpperCase()}`;
     btn.innerText = "SYNCING...";
 
     try {
-        await fetch(GOOGLE_URL, {
-            method: 'POST',
-            mode: 'no-cors',
-            body: JSON.stringify({ name, email, id })
-        });
-        btn.innerText = "LOGGED";
-        alert(`ID GENERATED: ${id}\nNoucair will verify shortly.`);
-    } catch (e) {
-        btn.innerText = "ERROR";
-    }
+        await fetch(GOOGLE_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify({ name, email, id }) });
+        alert(`Success! ID: ${id}`);
+        btn.innerText = "REQUEST SENT";
+    } catch (e) { btn.innerText = "ERROR"; }
 }
 
 function update() {
+    const color = document.getElementById('qr-color').value;
+    document.documentElement.style.setProperty('--brand', color);
     const source = document.getElementById('qrcode-raw');
     source.innerHTML = "";
     
     new QRCode(source, {
-        text: "https://allthinkers.com",
+        text: document.getElementById('qr-input').value || "https://allthinkers.com",
         width: 1000, height: 1000,
-        colorDark : "#3b82f6", colorLight : "#ffffff",
+        colorDark : color, colorLight : "#ffffff",
         correctLevel : QRCode.CorrectLevel.H
     });
 
     setTimeout(() => { 
         const qr = source.querySelector('canvas'); 
         if (qr) render(qr); 
-    }, 150);
+    }, 100);
 }
 
 function render(qr) {
-    const size = 1000;
-    canvas.width = size; canvas.height = size;
-    ctx.fillStyle = "#ffffff";
-    ctx.fillRect(0, 0, size, size);
+    const text = document.getElementById('qr-caption').value.toUpperCase();
+    const color = document.getElementById('qr-color').value;
+    const scale = parseFloat(document.getElementById('qr-scale').value);
+    const fontSize = parseInt(document.getElementById('qr-font').value);
     
-    // Draw QR centered
-    const qrSize = 750;
-    ctx.drawImage(qr, (size-qrSize)/2, (size-qrSize)/2 - 50, qrSize, qrSize);
-    
-    // Draw Button Label
-    ctx.fillStyle = "#3b82f6";
+    const size = 1200; canvas.width = size; canvas.height = size;
+    ctx.fillStyle = "#ffffff"; ctx.fillRect(0, 0, size, size);
+
+    const qrSize = size * scale;
+    ctx.drawImage(qr, (size-qrSize)/2, (size-qrSize)/2 - 80, qrSize, qrSize);
+
+    ctx.fillStyle = color;
     ctx.beginPath();
-    ctx.roundRect(150, 820, 700, 120, 30);
+    ctx.roundRect(100, 950, 1000, 150, 40);
     ctx.fill();
-    
+
     ctx.fillStyle = "#ffffff";
-    ctx.font = "bold 40px Arial";
+    ctx.font = `bold ${fontSize * 1.5}px Arial`;
     ctx.textAlign = "center";
-    ctx.fillText("ACCESS ECOSYSTEM", size/2, 895);
+    ctx.fillText(text, size/2, 1045);
 }
 
 function handleDownload() {
     const link = document.createElement('a');
-    link.download = `Architect-Mobile.png`;
+    link.download = `QR-Architect.png`;
     link.href = canvas.toDataURL("image/png");
     link.click();
 }
+
+window.onload = () => { if(window.location.hash === "#test") document.getElementById('sentinel').remove(); };
