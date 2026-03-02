@@ -37,3 +37,14 @@ input[type="range"] { flex: 1; -webkit-appearance: none; background: rgba(255,25
 .sentinel-gate { position: fixed; inset: 0; background: #020617; z-index: 5000; display: flex; align-items: center; justify-content: center; transition: 0.8s; }
 .sentinel-gate.unlocked { opacity: 0; pointer-events: none; transform: scale(1.1); }
 .pass-input { background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.1); border-radius: 100px; padding: 20px; text-align: center; color: #fff; letter-spacing: 0.8em; outline: none; width: 100%; }
+
+/* Add this to improve the mobile "Tuning Hub" scrolling experience */
+.control-list::-webkit-scrollbar {
+    display: none; /* Keeps the glass clean and minimal */
+}
+
+.control-list {
+    -ms-overflow-style: none;  
+    scrollbar-width: none;
+    scroll-behavior: smooth;
+}
