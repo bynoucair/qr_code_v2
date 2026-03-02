@@ -1,101 +1,50 @@
-const MASTER_KEY = "1988"; 
-const GOOGLE_URL = "https://script.google.com/macros/s/AKfycbwNRkFoFZFI3nsVhyeuwXY9G_PAynPURHo-LW5nT-jSiekkN6VgAq9MlqGCMatAIm2tjQ/exec";
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;800&family=JetBrains+Mono:wght@700&display=swap');
 
-const canvas = document.getElementById('output-canvas');
-const ctx = canvas.getContext('2d');
+:root { --accent: #3b82f6; --glass: rgba(15, 23, 42, 0.7); }
 
-function toggleSidebar() {
-    document.getElementById('sidebar').classList.toggle('active');
+body { font-family: 'Plus Jakarta Sans', sans-serif; height: 100vh; margin: 0; background: #020617; }
+
+.glass-blur { background: var(--glass); backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px); border: 1px solid rgba(255,255,255,0.08); }
+.glass-card { background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); border-radius: 32px; backdrop-filter: blur(10px); }
+
+.app-shell { height: 100vh; display: flex; flex-direction: column; }
+
+/* NAVIGATION */
+.top-nav { height: 70px; display: flex; align-items: center; justify-content: space-between; padding: 0 30px; z-index: 1000; }
+.brand-group { display: flex; align-items: center; gap: 12px; }
+.nav-text { font-family: 'JetBrains Mono'; font-size: 10px; font-weight: 700; letter-spacing: 2px; }
+.nav-links { display: flex; gap: 20px; }
+.nav-link { font-size: 8px; font-weight: 800; color: rgba(255,255,255,0.4); letter-spacing: 2px; }
+
+/* RESPONSIVE LAYOUT */
+.main-content { flex: 1; display: flex; overflow: hidden; position: relative; }
+.preview-stage { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 20px; }
+.qr-wrapper { width: 100%; max-width: 500px; aspect-ratio: 1/1; padding: 40px; display: flex; align-items: center; justify-content: center; }
+#output-canvas { width: 100% !important; height: 100% !important; border-radius: 12px; }
+
+/* CONTROL PANEL */
+.parameters-panel { width: 400px; padding: 30px; border-top: none; border-bottom: none; border-right: none; }
+@media (max-width: 1024px) {
+    .parameters-panel { position: fixed; inset: 0; width: 100%; transform: translateY(100%); z-index: 2000; }
+    .parameters-panel.active { transform: translateY(0); }
+    .nav-links { display: none; }
 }
 
-function checkProtocol(val) {
-    if (val === MASTER_KEY) {
-        document.getElementById('sentinel').classList.add('unlocked');
-        setTimeout(update, 300);
-    }
-}
+/* UI ELEMENTS */
+.control-list { display: flex; flex-direction: column; gap: 25px; }
+.group label { display: block; font-size: 8px; font-weight: 800; color: var(--accent); letter-spacing: 2px; margin-bottom: 10px; text-transform: uppercase; }
+.glass-input { width: 100%; background: rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; padding: 12px; color: #fff; font-size: 11px; outline: none; }
+.color-box { width: 100%; height: 50px; background: none; border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; cursor: pointer; }
 
-async function submitToSheet() {
-    const name = document.getElementById('req-name').value;
-    const email = document.getElementById('req-email').value;
-    const btn = document.getElementById('submit-btn');
-    if(!name || !email) return;
+.range-row { display: flex; align-items: center; justify-content: space-between; gap: 15px; margin-top: 10px; }
+.range-row span { font-size: 8px; font-weight: 800; color: rgba(255,255,255,0.4); text-transform: uppercase; width: 50px; }
+input[type="range"] { flex: 1; -webkit-appearance: none; background: rgba(255,255,255,0.1); height: 4px; border-radius: 2px; }
 
-    const id = `ARC-${Math.random().toString(36).substring(2, 7).toUpperCase()}`;
-    btn.innerText = "SYNCHRONIZING...";
-    btn.disabled = true;
+.btn-primary { background: var(--accent); color: #fff; padding: 16px 40px; border-radius: 100px; font-weight: 800; font-size: 10px; letter-spacing: 2px; border: none; cursor: pointer; margin-top: 30px; }
 
-    try {
-        await fetch(GOOGLE_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify({ name, email, id }) });
-        btn.innerText = "SUCCESS";
-        alert(`ACCESS REQUESTED. ID: ${id}`);
-    } catch (e) { btn.innerText = "ERROR"; btn.disabled = false; }
-}
+.tune-btn { font-size: 9px; font-weight: 900; background: rgba(255,255,255,0.1); padding: 8px 20px; border-radius: 100px; border: 1px solid rgba(255,255,255,0.1); }
 
-function update() {
-    const color = document.getElementById('qr-color').value;
-    document.documentElement.style.setProperty('--accent', color);
-    
-    const source = document.getElementById('qrcode-raw');
-    source.innerHTML = "";
-    
-    new QRCode(source, {
-        text: document.getElementById('qr-input').value || "https://allthinkers.com",
-        width: 1200, height: 1200,
-        colorDark : color, colorLight : "#ffffff",
-        correctLevel : QRCode.CorrectLevel.H
-    });
-
-    // Debounced rendering to ensure QR is ready
-    setTimeout(() => { 
-        const qr = source.querySelector('canvas'); 
-        if (qr) render(qr); 
-    }, 150);
-}
-
-function render(qr) {
-    const text = document.getElementById('qr-caption').value.toUpperCase();
-    const color = document.getElementById('qr-color').value;
-    const scale = parseFloat(document.getElementById('qr-scale').value);
-    const fontSize = parseInt(document.getElementById('qr-font').value);
-    const gap = parseInt(document.getElementById('qr-gap').value);
-    
-    const size = 1600; 
-    canvas.width = size; canvas.height = size;
-    
-    // Base Canvas
-    ctx.fillStyle = "#ffffff"; 
-    ctx.fillRect(0, 0, size, size);
-
-    const qrSize = size * scale;
-    const labelH = 180;
-    const totalH = qrSize + gap + labelH;
-    const startY = (size - totalH) / 2;
-
-    // QR Draw
-    ctx.drawImage(qr, (size - qrSize) / 2, startY, qrSize, qrSize);
-
-    // Dynamic Label
-    ctx.fillStyle = color;
-    ctx.beginPath();
-    const labelY = startY + qrSize + gap;
-    ctx.roundRect((size - (qrSize + 40))/2, labelY, qrSize + 40, labelH, 40);
-    ctx.fill();
-
-    // Typography
-    ctx.fillStyle = "#ffffff";
-    ctx.font = `bold ${fontSize * 1.8}px 'Plus Jakarta Sans'`;
-    ctx.textAlign = "center";
-    ctx.textBaseline = "middle";
-    ctx.fillText(text, size / 2, labelY + (labelH / 2) + 5);
-}
-
-function handleDownload() {
-    const link = document.createElement('a');
-    link.download = `Architect-Ecosystem-${Date.now()}.png`;
-    link.href = canvas.toDataURL("image/png", 1.0);
-    link.click();
-}
-
-// Initial Call
-window.onload = () => { if(window.location.hash === "#auth") document.getElementById('sentinel').remove(); };
+/* SENTINEL */
+.sentinel-gate { position: fixed; inset: 0; background: #020617; z-index: 5000; display: flex; align-items: center; justify-content: center; transition: 0.8s; }
+.sentinel-gate.unlocked { opacity: 0; pointer-events: none; transform: scale(1.1); }
+.pass-input { background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.1); border-radius: 100px; padding: 18px 30px; color: #fff; text-align: center; letter-spacing: 0.5em; outline: none; }
