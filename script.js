@@ -78,6 +78,16 @@ function handleDownload() {
     link.click();
 }
 
+// Add this to your existing script.js
+function triggerRefresh() {
+    const btn = document.querySelector('.btn-primary');
+    btn.innerText = "SYNCHRONIZING...";
+    update();
+    setTimeout(() => {
+        btn.innerText = "EXPORT IDENTITY";
+    }, 600);
+}
+
 window.onload = () => {
     if(window.location.hash === "#bypass") document.getElementById('sentinel').remove();
 };
