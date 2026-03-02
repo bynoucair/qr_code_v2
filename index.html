@@ -2,8 +2,8 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Architect Prime | Noucair B. Synthesis</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Architect Prime | Noucair B.</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
@@ -11,72 +11,28 @@
     
     <link rel="stylesheet" href="style.css">
 </head>
-<body>
-
-    <div id="sentinel" class="sentinel-gate">
-        <div class="w-16 h-16 bg-blue-600 rounded-2xl flex items-center justify-center font-black mb-8 shadow-2xl text-white">N</div>
-        <h2 class="text-[10px] font-black uppercase tracking-[0.6em] text-white/40 mb-8 text-center">Security Protocol: Active</h2>
+<body class="fixed-body"> <div id="sentinel" class="sentinel-gate">
+        <div class="w-16 h-16 bg-blue-600 rounded-2xl flex items-center justify-center font-black mb-6 shadow-2xl text-white">N</div>
         
-        <div class="flex flex-col items-center gap-4 w-[320px] px-6">
-            <input type="password" id="access-key" class="pass-input w-full" placeholder="ENTER MASTER KEY" oninput="checkProtocol(this.value)">
+        <div class="flex flex-col items-center gap-4 w-full max-w-[300px] px-4">
+            <input type="password" id="access-key" class="pass-input w-full" placeholder="MASTER KEY" inputmode="numeric" oninput="checkProtocol(this.value)">
             
-            <div class="h-[1px] w-12 bg-white/10 my-4"></div>
+            <div class="h-[1px] w-12 bg-white/10 my-2"></div>
             
-            <p class="text-[8px] font-bold text-blue-500 uppercase tracking-[0.3em] mb-2">Request New Identity Key</p>
-            <input type="text" id="req-name" class="prime-input w-full" placeholder="FULL NAME">
-            <input type="email" id="req-email" class="prime-input w-full" placeholder="PROFESSIONAL EMAIL">
+            <input type="text" id="req-name" class="prime-input w-full" placeholder="NAME">
+            <input type="email" id="req-email" class="prime-input w-full" placeholder="EMAIL">
             
-            <button onclick="submitToSheet()" id="submit-btn" class="btn-gen w-full">Request Access</button>
-            
-            <div class="flex items-center gap-4 mt-4">
-                <a href="https://wa.me/212600000000" target="_blank" class="text-[8px] font-black text-green-500 hover:text-green-400 uppercase tracking-widest transition-all">WhatsApp Direct</a>
-            </div>
+            <button id="submit-btn" class="btn-gen w-full">REQUEST ACCESS</button>
         </div>
-        <p class="text-[8px] font-bold text-slate-600 uppercase tracking-widest mt-12 text-center">Authorized Access Only | Noucair B. Ecosystem</p>
     </div>
 
-    <div class="app-shell">
-        <aside class="sidebar">
-            <div class="p-8 border-b border-white/5 flex items-center gap-4">
-                <div class="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center font-bold text-sm text-white">N</div>
-                <h1 class="text-[10px] font-black uppercase tracking-[0.4em] text-white">Architect Prime</h1>
-            </div>
-
-            <div class="scroll-container">
-                <div class="flex gap-2 mb-6">
-                    <button onclick="setPreset('#3b82f6', 'ACCESS ALLTHINKERS')" class="preset-btn bg-blue-600/20 text-blue-400 border-blue-600/30">Thinker</button>
-                    <button onclick="setPreset('#a855f7', 'ANDROMEDERS CORE')" class="preset-btn bg-purple-600/20 text-purple-400 border-purple-600/30">Andromeda</button>
-                </div>
-
-                <div class="bento-group">
-                    <label class="label-tiny">01. Identity Source</label>
-                    <input type="text" id="qr-input" value="https://allthinkers.com" class="prime-input">
-                    <input type="text" id="qr-caption" value="ACCESS ECOSYSTEM" class="prime-input">
-                </div>
-
-                <div class="bento-group">
-                    <label class="label-tiny">02. Spatial Tuning</label>
-                    <div class="mt-4 space-y-6">
-                        <input type="range" id="qr-scale" min="0.4" max="0.8" step="0.01" value="0.72" class="w-full">
-                        <input type="range" id="qr-font" min="20" max="64" step="1" value="42" class="w-full">
-                    </div>
-                </div>
-
-                <div class="bento-group">
-                    <label class="label-tiny">03. Brand Hue</label>
-                    <input type="color" id="qr-color" value="#3b82f6" class="w-full h-10 bg-transparent cursor-pointer border-none mt-2">
-                </div>
-
-                <button onclick="update()" class="btn-gen">Generate Identity</button>
-            </div>
-        </aside>
-
-        <main class="viewport-stage">
+    <div class="app-shell flex-col lg:flex-row">
+        <main class="viewport-stage order-1 lg:order-2">
             <div class="glass-pub">
-                <div class="brand-sig"><div class="dot-status"></div>BY NOUCAIR B.</div>
-                <div class="nav-links">
-                    <a href="https://allthinkers.com" target="_blank" class="nav-link">AllThinkers</a>
-                    <a href="https://andromeders.com" target="_blank" class="nav-link">Andromeders</a>
+                <div class="brand-sig">BY NOUCAIR B.</div>
+                <div class="nav-links hidden md:flex">
+                    <span class="nav-link">ALLTHINKERS</span>
+                    <span class="nav-link">ANDROMEDERS</span>
                 </div>
             </div>
 
@@ -86,9 +42,9 @@
                 </div>
             </div>
 
-            <div class="action-dock">
-                <button onclick="handleDownload()" class="btn-main">Export PNG</button>
-                <button onclick="exportExecutiveSummary()" class="btn-main-alt">PDF Summary</button>
+            <div class="action-dock pb-8">
+                <button onclick="handleDownload()" class="btn-main">SAVE PNG</button>
+                <button onclick="update()" class="btn-main-alt">REFRESH</button>
                 <div id="qrcode-raw" class="hidden"></div>
             </div>
         </main>
